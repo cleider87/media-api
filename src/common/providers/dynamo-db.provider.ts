@@ -53,8 +53,6 @@ export class DynamoDBProvider {
         ExpressionAttributeNames: expressionAttributeNames,
         ReturnValues: 'ALL_NEW',
       });
-
-      console.log(command.input);
       const { Attributes: item } = await this.dynamo.send(command);
       return item;
     } catch (e) {

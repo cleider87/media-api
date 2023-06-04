@@ -21,6 +21,7 @@ export class StorageProvider {
       Bucket: bucket,
       Key: key,
       Body: body,
+      ACL: 'public-read'
     });
   }
 }

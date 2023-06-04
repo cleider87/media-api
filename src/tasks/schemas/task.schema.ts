@@ -1,4 +1,4 @@
-import { Schema } from "src/common/interfaces/schema";
+import { Schema } from "../../common/interfaces/schema";
 import { TaskState } from "../constants/tasks.constant";
 
 export class TaskSchema extends Schema{
