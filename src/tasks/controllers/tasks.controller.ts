@@ -42,6 +42,7 @@ export class TasksController {
       image.originalname,
       image.buffer,
     );
+    await this.imagesService.create(originalPath,true);
     return this.tasksService.updateById(task.id, TaskState.UPLOADED);
   }
 
