@@ -12,3 +12,8 @@ variable "bucket_name" {
   description = "Media API S3 bucket"
   default     = "media-api-static-resources"
 }
+
+variable "backend-image" {
+  description = "Media API Backend Image"
+  default     = "cleider87/media-api-backend"
+}
