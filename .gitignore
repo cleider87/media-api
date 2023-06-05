@@ -33,7 +33,9 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 .env
-infra/.terraform/providers/registry.terraform.io/hashicorp/aws/5.1.0/linux_amd64/terraform-provider-aws_v5.1.0_x5
+infra/.terraform
 infra/.terraform.lock.hcl
 infra/terraform.tfstate
 infra/terraform.tfstate.backup
+lambda.zip
+infra/lamda.zip

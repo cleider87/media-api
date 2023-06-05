@@ -1,3 +1,8 @@
+variable "app-prefix" {
+  description = "Media API Prefix"
+  default     = "tf-media-api"
+}
+
 variable "aws_region" {
   description = "AWS region"
   default     = "us-east-1"

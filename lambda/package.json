@@ -1,0 +1,11 @@
+{
+  "name": "media-api-resize-lambda",
+  "version": "1.0.0",
+  "description": "Resize images from s3 input",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Cleider Herrera <cleider87@gmail.com>",
+  "license": "UNLICENSED"
+}
