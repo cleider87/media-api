@@ -38,14 +38,14 @@ resource "aws_route" "tf_internet_access" {
   gateway_id             = aws_internet_gateway.tf_internet_gateway.id
 }
 
-resource "aws_security_group" "tf_sg_media" {
+resource "aws_security_group" "tf_lb_sg" {
   name        = "${var.app-prefix}-sg-ecs"
   description = "Allow TLS inbound traffic on port 80 (http)"
   vpc_id      = aws_vpc.tf_vpc.id
 
   ingress {
     from_port   = 80
-    to_port     = 3000
+    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
