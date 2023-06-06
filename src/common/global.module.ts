@@ -5,7 +5,7 @@ import * as Joi from 'joi';
 const configuration = ConfigModule.forRoot({
   validationSchema: Joi.object({
     NODE_ENV: Joi.string()
-      .valid('development', 'production')
+      .valid('test','development', 'production')
       .default('development'),
     PORT: Joi.number().default(3000),
     AWS_ACCESS_KEY: Joi.string().default('localhost'),

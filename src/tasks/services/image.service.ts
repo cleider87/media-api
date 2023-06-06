@@ -1,11 +1,11 @@
-import * as md5 from 'md5';
-import { v4 as uuidv4 } from 'uuid';
-import * as moment from 'moment';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import * as md5 from 'md5';
+import * as moment from 'moment';
+import { v4 as uuidv4 } from 'uuid';
+import { DynamoDBProvider } from '../../common/providers/dynamo-db.provider';
 import { StorageProvider } from '../../common/providers/storage.provider';
 import { INPUT_DIR } from '../constants/tasks.constant';
-import { DynamoDBProvider } from 'src/common/providers/dynamo-db.provider';
 import { ImageSchema } from '../schemas/image.schema';
 
 @Injectable()
@@ -31,7 +31,7 @@ export class ImagesService {
       await this.dynamoDBProvider.create(this.tableName, image);
       return image;
     } catch (e) {
-      throw new InternalServerErrorException(e);
+      throw new InternalServerErrorException('Cannot be registered the image!');
     }
   }
 
@@ -40,7 +40,7 @@ export class ImagesService {
     body: Buffer,
     contentType: string,
     metadata?: Record<string, string>,
-  ) {
+  ): Promise<string> {
     const key = this.getKey(filename);
     return this.storageProvider
       .upload(
@@ -56,7 +56,7 @@ export class ImagesService {
       });
   }
 
-  getKey(filename: string) {
+  getKey(filename: string): string {
     return `${INPUT_DIR}/${filename}`;
   }
 }

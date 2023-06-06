@@ -19,6 +19,20 @@ describe('AppController (e2e)', () => {
     return request(app.getHttpServer())
       .get('/')
       .expect(200)
-      .expect('Hello World!');
+      .expect('media-api');
+  });
+
+  it('/health (GET)', () => {
+    return request(app.getHttpServer())
+      .get('/health')
+      .expect(200)
+      .then((response) => {
+        expect(response.body.statusCode).toEqual(200);
+        expect(response.body.message).toEqual("media-api it's OK!");
+      });
+  });
+
+  afterAll(async () => {
+    await app.close();
   });
 });
