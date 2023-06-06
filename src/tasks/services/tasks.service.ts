@@ -32,7 +32,10 @@ export class TasksService {
 
   async getById(taskId: string): Promise<TaskSchema> {
     try {
-      return this.dynamoDBProvider.getById(this.tableName, taskId);
+      const {
+        Items: [task],
+      } = await this.dynamoDBProvider.getById(this.tableName, taskId);
+      return task;
     } catch (e) {
       throw new InternalServerErrorException('Cannot be recovered the task!');
     }
@@ -40,13 +43,16 @@ export class TasksService {
 
   async updateById(taskId: string, state: TaskState): Promise<TaskSchema> {
     try {
-      return this.dynamoDBProvider.updateById(
+      const {
+        Items: [task],
+      } = await this.dynamoDBProvider.updateById(
         this.tableName,
         taskId,
         'set #state = :state, updated = :updated',
         { ':state': state, ':updated': moment().format() },
         { '#state': 'state' },
       );
+      return task;
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
