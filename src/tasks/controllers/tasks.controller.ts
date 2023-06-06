@@ -1,7 +1,10 @@
 import {
   Controller,
+  FileTypeValidator,
   Get,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -13,7 +16,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ImagesService } from '../services/image.service';
 import { TaskSchema } from '../schemas/task.schema';
 import { CreateTaskDto } from '../dtos/create-task.dto';
-import { TaskState } from '../constants/tasks.constant';
+import { MAX_FILE_SIZE_BYTES, TaskState } from '../constants/tasks.constant';
 
 @ApiTags('Tasks')
 @Controller('tasks')
@@ -28,7 +31,14 @@ export class TasksController {
   @UseInterceptors(FileInterceptor('image'))
   @ApiOperation({ description: 'Create a taks' })
   @ApiBody({ description: 'Image to upload', type: CreateTaskDto })
-  async createTasks(@UploadedFile() image: Express.Multer.File) {
+  async createTasks(
+    @UploadedFile(new ParseFilePipe({
+      validators: [
+        new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
+        new MaxFileSizeValidator({ maxSize: MAX_FILE_SIZE_BYTES }),
+      ],
+    }),) image: Express.Multer.File,
+  ): Promise<TaskSchema> {
     const originalPath = this.imagesService.getKey(image.originalname);
     const task: TaskSchema = await this.tasksService.create(originalPath);
     await this.imagesService.upload(
@@ -45,7 +55,7 @@ export class TasksController {
 
   @Get('/:taskId')
   @ApiOperation({ description: 'Get current state of a task by ID' })
-  getTaskById(@Param('taskId') taskId: string) {
+  getTaskById(@Param('taskId') taskId: string): Promise<TaskSchema> {
     return this.tasksService.getById(taskId);
   }
 }

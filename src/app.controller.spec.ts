@@ -7,6 +7,8 @@ describe('AppController', () => {
   let appController: AppController;
 
   beforeEach(async () => {
+    process.env.NODE_ENV = 'test';
+
     const moduleRef = await Test.createTestingModule({
       imports: [GlobalModule, HealthModule],
       controllers: [AppController],

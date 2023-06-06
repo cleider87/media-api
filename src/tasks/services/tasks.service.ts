@@ -1,10 +1,10 @@
-import * as md5 from 'md5';
-import { v4 as uuidv4 } from 'uuid';
-import * as moment from "moment";
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { TaskSchema } from '../schemas/task.schema';
+import * as md5 from 'md5';
+import * as moment from 'moment';
+import { v4 as uuidv4 } from 'uuid';
+import { DynamoDBProvider } from '../../common/providers/dynamo-db.provider';
 import { TaskState } from '../constants/tasks.constant';
-import { DynamoDBProvider } from 'src/common/providers/dynamo-db.provider';
+import { TaskSchema } from '../schemas/task.schema';
 
 @Injectable()
 export class TasksService {
@@ -26,21 +26,21 @@ export class TasksService {
       await this.dynamoDBProvider.create(this.tableName, task);
       return task;
     } catch (e) {
-      throw new InternalServerErrorException(e);
+      throw new InternalServerErrorException('Cannot be registered the task!');
     }
   }
 
-  async getById(taskId: string) {
+  async getById(taskId: string): Promise<TaskSchema> {
     try {
-      return await this.dynamoDBProvider.getById(this.tableName, taskId);
+      return this.dynamoDBProvider.getById(this.tableName, taskId);
     } catch (e) {
-      throw new InternalServerErrorException(e);
+      throw new InternalServerErrorException('Cannot be recovered the task!');
     }
   }
 
-  async updateById(taskId: string, state: TaskState) {
+  async updateById(taskId: string, state: TaskState): Promise<TaskSchema> {
     try {
-      return await this.dynamoDBProvider.updateById(
+      return this.dynamoDBProvider.updateById(
         this.tableName,
         taskId,
         'set #state = :state, updated = :updated',
