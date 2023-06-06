@@ -35,10 +35,21 @@ export class ImagesService {
     }
   }
 
-  async upload(filename: string, body: Buffer) {
+  async upload(
+    filename: string,
+    body: Buffer,
+    contentType: string,
+    metadata?: Record<string, string>,
+  ) {
     const key = this.getKey(filename);
     return this.storageProvider
-      .upload(this.configService.get('AWS_BUCKET'), key, body)
+      .upload(
+        this.configService.get('AWS_BUCKET'),
+        key,
+        body,
+        contentType,
+        metadata,
+      )
       .then(() => key)
       .catch(() => {
         throw new InternalServerErrorException('The file cannot be uploaded');

@@ -7,5 +7,12 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Cleider Herrera <cleider87@gmail.com>",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": {
+    "aws-sdk": "^2.1390.0",
+    "md5": "^2.3.0",
+    "moment": "^2.29.4",
+    "sharp": "^0.32.1",
+    "uuid": "^9.0.0"
+  }
 }

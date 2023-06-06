@@ -1,20 +1,13 @@
 import {
   Controller,
   Get,
-  InternalServerErrorException,
   Param,
   Post,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { Express } from 'express';
-import {
-  ApiBody,
-  ApiConsumes,
-  ApiOperation,
-  ApiProperty,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { TasksService } from '../services/tasks.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImagesService } from '../services/image.service';
@@ -34,15 +27,19 @@ export class TasksController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('image'))
   @ApiOperation({ description: 'Create a taks' })
-  @ApiBody({ description:'Image to upload',type: CreateTaskDto })
+  @ApiBody({ description: 'Image to upload', type: CreateTaskDto })
   async createTasks(@UploadedFile() image: Express.Multer.File) {
     const originalPath = this.imagesService.getKey(image.originalname);
     const task: TaskSchema = await this.tasksService.create(originalPath);
     await this.imagesService.upload(
       image.originalname,
       image.buffer,
+      image.mimetype,
+      {
+        taskId: task.id,
+      },
     );
-    await this.imagesService.create(originalPath,true);
+    await this.imagesService.create(originalPath, true);
     return this.tasksService.updateById(task.id, TaskState.UPLOADED);
   }
 

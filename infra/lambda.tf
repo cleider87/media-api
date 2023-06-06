@@ -32,6 +32,20 @@ resource "aws_iam_policy" "tf_s3_lambda_resize_role" {
         "ec2:DeleteNetworkInterface"
       ]
       Resource = ["*"]
+      }, {
+      Effect = "Allow"
+      Action = [
+        "s3:*"
+      ]
+      Resource = ["arn:aws:s3:::${var.bucket_name}/*"]
+      }, {
+      Effect = "Allow"
+      Action = [
+        "dynamodb:*"
+      ],
+      Resource = [
+        "arn:aws:dynamodb:${var.aws_region}:${local.account_id}:*"
+      ]
     }]
   })
 }
@@ -54,6 +68,7 @@ resource "aws_lambda_function" "tf_s3_lambda_resize" {
   source_code_hash = data.archive_file.tf_s3_lambda_resize_file.output_base64sha256
   handler          = "index.handler"
   runtime          = "nodejs16.x"
+  timeout          = 30
 
   environment {
     variables = {
