@@ -1,4 +1,16 @@
-variable "app-prefix" {
+variable "stage" {
+  description = "Environment"
+  default     = "dev"
+}
+
+variable "tags" {
+  default = {
+    Environment = "dev"
+    Project     = "tf-media"
+  }
+}
+
+variable "prefix" {
   description = "Media API Prefix"
   default     = "tf-media-api"
 }

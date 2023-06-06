@@ -1,5 +1,5 @@
 resource "aws_iam_role" "tf_s3_lambda_resize_role" {
-  name = "${var.app-prefix}-lambda-resize-role"
+  name = "${var.prefix}-lambda-resize-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -13,7 +13,7 @@ resource "aws_iam_role" "tf_s3_lambda_resize_role" {
 }
 
 resource "aws_iam_policy" "tf_s3_lambda_resize_role" {
-  name = "${var.app-prefix}-lambda-resize-role"
+  name = "${var.prefix}-lambda-resize-role"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -62,7 +62,7 @@ data "archive_file" "tf_s3_lambda_resize_file" {
 }
 
 resource "aws_lambda_function" "tf_s3_lambda_resize" {
-  function_name    = "${var.app-prefix}-lambda-resize"
+  function_name    = "${var.prefix}-lambda-resize"
   role             = aws_iam_role.tf_s3_lambda_resize_role.arn
   filename         = "../lambda.zip"
   source_code_hash = data.archive_file.tf_s3_lambda_resize_file.output_base64sha256

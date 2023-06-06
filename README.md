@@ -1,5 +1,7 @@
 # Media API
 
+![Base infrastructure](docs/diagram.png)
+
 ## Description
 
 
