@@ -16,12 +16,14 @@ export class StorageProvider {
     });
   }
 
-  async upload(bucket: string, key: string, body: Buffer) {
+  async upload(bucket: string, key: string, body: Buffer, contentType: string, metadata?: Record<string, string>) {
     return this.client.putObject({
       Bucket: bucket,
       Key: key,
       Body: body,
-      ACL: 'public-read'
+      ContentType: contentType,
+      Metadata: metadata,
+      ACL: 'public-read',
     });
   }
 }

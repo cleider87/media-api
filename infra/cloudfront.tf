@@ -1,7 +1,7 @@
 resource "aws_cloudfront_distribution" "distribution" {
   origin {
-    domain_name = aws_s3_bucket.bucket.bucket_regional_domain_name
-    origin_id   = aws_s3_bucket.bucket.id
+    domain_name = aws_s3_bucket.tf_s3_bucket.bucket_regional_domain_name
+    origin_id   = aws_s3_bucket.tf_s3_bucket.id
   }
 
   enabled             = true
@@ -13,7 +13,7 @@ resource "aws_cloudfront_distribution" "distribution" {
     viewer_protocol_policy = "redirect-to-https"
     allowed_methods        = ["GET", "HEAD", "OPTIONS"]
     cached_methods         = ["GET", "HEAD"]
-    target_origin_id       = aws_s3_bucket.bucket.id
+    target_origin_id       = aws_s3_bucket.tf_s3_bucket.id
 
     forwarded_values {
       query_string = false
