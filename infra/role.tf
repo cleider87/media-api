@@ -1,5 +1,5 @@
 resource "aws_iam_role" "tf_ecs_role" {
-  name = "${var.app-prefix}-ecs-role"
+  name = "${var.prefix}-ecs-role"
 
   assume_role_policy = <<POLICY
 {

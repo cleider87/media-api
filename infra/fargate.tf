@@ -1,11 +1,11 @@
 # Cluster
 resource "aws_ecs_cluster" "tf_backend_cluster" {
-  name = "${var.app-prefix}-backend-cluster"
+  name = "${var.prefix}-backend-cluster"
 }
 
 # Tasks definition
 resource "aws_ecs_task_definition" "tf_backend_task" {
-  family                   = "${var.app-prefix}-backend-family"
+  family                   = "${var.prefix}-backend-family"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   memory                   = "512"
@@ -16,7 +16,7 @@ resource "aws_ecs_task_definition" "tf_backend_task" {
   container_definitions = jsonencode(
     [
       {
-        name : "${var.app-prefix}-backend",
+        name : "${var.prefix}-backend",
         image : "${var.backend-image}:latest",
         memory : 512,
         essential : true,
@@ -57,7 +57,7 @@ resource "aws_ecs_task_definition" "tf_backend_task" {
           logDriver : "awslogs",
           options : {
             "awslogs-create-group" : "true",
-            "awslogs-group" : "${var.app-prefix}-backend-api",
+            "awslogs-group" : "${var.prefix}-backend-api",
             "awslogs-region" : "${var.aws_region}",
             "awslogs-stream-prefix" : "ecs"
           }
@@ -69,7 +69,7 @@ resource "aws_ecs_task_definition" "tf_backend_task" {
 # ECS Service
 
 resource "aws_security_group" "tf_backend_sg" {
-  name        = "${var.app-prefix}-backend_sg"
+  name        = "${var.prefix}-backend_sg"
   description = "allow inbound access from the ALB only"
   vpc_id      = aws_vpc.tf_vpc.id
 
@@ -97,7 +97,7 @@ resource "aws_security_group" "tf_backend_sg" {
 
 
 resource "aws_ecs_service" "tf_backend_service" {
-  name = "${var.app-prefix}-backend-service"
+  name = "${var.prefix}-backend-service"
 
   cluster         = aws_ecs_cluster.tf_backend_cluster.id
   task_definition = aws_ecs_task_definition.tf_backend_task.arn
@@ -106,8 +106,8 @@ resource "aws_ecs_service" "tf_backend_service" {
   desired_count = 1
 
   load_balancer {
-    target_group_arn = aws_alb_target_group.tf_backend_tg.id
-    container_name   = "${var.app-prefix}-backend"
+    target_group_arn = aws_lb_target_group.tf_backend_tg.id
+    container_name   = "${var.prefix}-backend"
     container_port   = 3000
   }
 
@@ -118,27 +118,36 @@ resource "aws_ecs_service" "tf_backend_service" {
   }
 }
 
-resource "aws_alb_target_group" "tf_backend_tg" {
-  name        = "${var.app-prefix}-alb-tg-backend"
+resource "aws_alb" "tf_backend_alb" {
+  load_balancer_type = "application"
+  internal           = true
+  subnets            = [aws_subnet.tf_public_a.id, aws_subnet.tf_public_b.id]
+  security_groups    = ["${aws_security_group.tf_lb_sg.id}"]
+  depends_on = [aws_internet_gateway.tf_internet_gateway]
+}
+
+resource "aws_lb_target_group" "tf_backend_tg" {
+  name        = "${var.prefix}-alb-tg-backend"
   port        = 3000
   protocol    = "HTTP"
   vpc_id      = aws_vpc.tf_vpc.id
   target_type = "ip"
+
+  health_check {
+    enabled = true
+    path    = "/"
+  }
+
+  depends_on = [aws_alb.tf_backend_alb]
 }
 
 resource "aws_lb_listener" "tf_tg_listener" {
-  load_balancer_arn = aws_lb.tf_backend_alb.arn
+  load_balancer_arn = aws_alb.tf_backend_alb.arn
   port              = "80"
   protocol          = "HTTP"
 
   default_action {
-    target_group_arn = aws_alb_target_group.tf_backend_tg.arn
+    target_group_arn = aws_lb_target_group.tf_backend_tg.arn
     type             = "forward"
   }
-}
-
-resource "aws_lb" "tf_backend_alb" {
-  load_balancer_type = "application"
-  subnets            = [aws_subnet.tf_public_a.id, aws_subnet.tf_public_b.id]
-  security_groups    = ["${aws_security_group.tf_sg_media.id}"]
 }

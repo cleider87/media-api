@@ -2,34 +2,46 @@ resource "aws_vpc" "tf_vpc" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
   enable_dns_support   = true
-  tags = {
-    name = "${var.app-prefix}-vpc"
-  }
+  tags = merge(
+    {
+      Name = var.prefix
+    },
+    var.tags
+  )
 }
 
 resource "aws_subnet" "tf_public_a" {
   vpc_id            = aws_vpc.tf_vpc.id
   cidr_block        = "10.0.1.0/24"
   availability_zone = "${var.aws_region}a"
-  tags = {
-    name = "${var.app-prefix}-sn-public-a"
-  }
+  tags = merge(
+    {
+      Name = "${var.prefix}-sn-public-a"
+    },
+    var.tags
+  )
 }
 
 resource "aws_subnet" "tf_public_b" {
   vpc_id            = aws_vpc.tf_vpc.id
   cidr_block        = "10.0.2.0/24"
   availability_zone = "${var.aws_region}b"
-  tags = {
-    name = "${var.app-prefix}-sn-public-b"
-  }
+  tags = merge(
+    {
+      Name = "${var.prefix}-sn-public-b"
+    },
+    var.tags
+  )
 }
 
 resource "aws_internet_gateway" "tf_internet_gateway" {
   vpc_id = aws_vpc.tf_vpc.id
-  tags = {
-    name = "${var.app-prefix}-igw"
-  }
+  tags = merge(
+    {
+      Name = "${var.prefix}-igw"
+    },
+    var.tags
+  )
 }
 
 resource "aws_route" "tf_internet_access" {
@@ -39,7 +51,7 @@ resource "aws_route" "tf_internet_access" {
 }
 
 resource "aws_security_group" "tf_lb_sg" {
-  name        = "${var.app-prefix}-sg-ecs"
+  name        = "${var.prefix}-sg-ecs"
   description = "Allow TLS inbound traffic on port 80 (http)"
   vpc_id      = aws_vpc.tf_vpc.id
 
@@ -47,6 +59,13 @@ resource "aws_security_group" "tf_lb_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
