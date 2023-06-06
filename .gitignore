@@ -3534,3 +3534,5 @@ lambda/node_modules/yallist/LICENSE
 lambda/node_modules/yallist/package.json
 lambda/node_modules/yallist/README.md
 lambda/node_modules/yallist/yallist.js
+infra/terraform.tfvars
+infra/.terraform.tfstate.lock.info

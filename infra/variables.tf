@@ -17,3 +17,13 @@ variable "backend-image" {
   description = "Media API Backend Image"
   default     = "cleider87/media-api-backend"
 }
+
+variable "aws_access_key" {
+  description = "AWS Access Key"
+  default     = "localhost"
+}
+
+variable "aws_secret_key" {
+  description = "AWS Secret Key"
+  default     = "localhost"
+}
