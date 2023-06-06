@@ -13,7 +13,7 @@ const IMAGES_TABLE = 'ddb-media-api-images';
 exports.handler = async function (event, context) {
   console.log('Received S3 event:', JSON.stringify(event, null, 2));
   const bucket = event.Records[0].s3.bucket.name;
-  const key = decodeURI(event.Records[0].s3.object.key);
+  const key = decodeURIComponent(event.Records[0].s3.object.key);
 
   console.log(`Bucket: ${bucket}`, `Key: ${key}`);
 
