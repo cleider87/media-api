@@ -4,7 +4,10 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as compression from 'compression';
 import * as dotenv from 'dotenv';
+import { join } from 'path';
 
+import { ConfigService } from '@nestjs/config';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import {
   customCss,
@@ -12,15 +15,18 @@ import {
   titleApi,
   version,
 } from './common/constants/common-api.constants';
-import { ConfigService } from '@nestjs/config';
 
 dotenv.config();
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    cors: true
-  });
+  const app = await NestFactory.create<NestExpressApplication>(
+    AppModule,
+  );
+
   const configService = app.get(ConfigService);
+
+  app.setBaseViewsDir(join(__dirname, '..', 'views'));
+  app.setViewEngine('hbs');
 
   app.setGlobalPrefix('api', { exclude: ['/'] });
 

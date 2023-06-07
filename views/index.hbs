@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <title>Media Resources</title>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Media Resources</h1>
+    <h2>Images uploaded</h2>
+    <div class="container">
+      <div class="row row-cols-4">
+        {{#each uploaded}}
+        <div class="col-4">
+          <div class="card">
+            <img src="{{this}}" class="card-img-top" alt="{{this}}">
+            <div class="card-body">
+              <a href="{{this}}" class="btn btn-primary">Download</a>
+            </div>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+
+
+    <h2>Images resized</h2>
+    <div class="container">
+      <div class="row row-cols-4">
+        {{#each resized}}
+        <div class="col-4">
+          <div class="card">
+            <img src="{{this}}" class="card-img-top" alt="{{this}}">
+            <div class="card-body">
+              <a href="{{this}}" class="btn btn-primary">Download</a>
+            </div>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>

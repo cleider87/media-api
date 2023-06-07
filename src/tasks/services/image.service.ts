@@ -5,7 +5,7 @@ import * as moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
 import { DynamoDBProvider } from '../../common/providers/dynamo-db.provider';
 import { StorageProvider } from '../../common/providers/storage.provider';
-import { INPUT_DIR } from '../constants/tasks.constant';
+import { INPUT_DIR, OUTPUT_DIR } from '../constants/tasks.constant';
 import { ImageSchema } from '../schemas/image.schema';
 
 @Injectable()
@@ -54,6 +54,20 @@ export class ImagesService {
       .catch(() => {
         throw new InternalServerErrorException('The file cannot be uploaded');
       });
+  }
+
+  async listUploads() {
+    return this.storageProvider.list(
+      this.configService.get('AWS_BUCKET'),
+      INPUT_DIR,
+    );
+  }
+
+  async listResized() {
+    return this.storageProvider.list(
+      this.configService.get('AWS_BUCKET'),
+      OUTPUT_DIR,
+    );
   }
 
   getKey(filename: string): string {

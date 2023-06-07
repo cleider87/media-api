@@ -16,7 +16,25 @@ export class StorageProvider {
     });
   }
 
-  async upload(bucket: string, key: string, body: Buffer, contentType: string, metadata?: Record<string, string>) {
+  async list(bucket: string, prefix: string) {
+    const { Contents } = await this.client.listObjects({
+      Bucket: bucket,
+      Prefix: prefix,
+    });
+    return (
+      Contents?.map(
+        (item) => `https://${bucket}.s3.amazonaws.com/${item.Key}`,
+      ) || []
+    );
+  }
+
+  async upload(
+    bucket: string,
+    key: string,
+    body: Buffer,
+    contentType: string,
+    metadata?: Record<string, string>,
+  ) {
     return this.client.putObject({
       Bucket: bucket,
       Key: key,

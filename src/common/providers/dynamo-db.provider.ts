@@ -68,7 +68,7 @@ export class DynamoDBProvider {
     values: Record<string, any>,
     expressionAttributeNames?: Record<string, any>,
   ): Promise<any> {
-    return await this.update(
+    return this.update(
       tableName,
       {
         id,
@@ -90,8 +90,9 @@ export class DynamoDBProvider {
         ConsistentRead: true,
       });
 
-      return await this.dynamo.send(command);
+      return this.dynamo.send(command);
     } catch (e) {
+      console.log(e)
       throw new InternalServerErrorException(e);
     }
   }

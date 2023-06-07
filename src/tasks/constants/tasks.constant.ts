@@ -5,6 +5,7 @@ export enum TaskState {
 }
 
 export const INPUT_DIR = 'upload';
+export const OUTPUT_DIR = 'output';
 
 const MAX_FILE_SIZE_MB = 20
 
