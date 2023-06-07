@@ -6,6 +6,7 @@ const { v4 } = require('uuid');
 const s3 = new aws.S3();
 
 const { create, updateById } = require('./dynamodb');
+const { errorMonitor } = require('events');
 
 const TASKS_TABLE = 'ddb-media-api-tasks';
 const IMAGES_TABLE = 'ddb-media-api-images';
@@ -17,54 +18,59 @@ exports.handler = async function (event, context) {
 
   console.log(`Bucket: ${bucket}`, `Key: ${key}`);
 
-  console.log('Downloading from ', key);
-  const imageS3 = await s3.getObject({ Bucket: bucket, Key: key }).promise();
-  const { taskid } = imageS3.Metadata;
-  const resolutions = [800, 1024];
+  let statusCode;
+  await new Promise(async function (resolve, reject) {
+    console.log('Downloading from ', key);
 
-  for (const resolution of resolutions) {
-    try {
-      console.log('Resizing to ', resolution);
-      const resizedImage = await sharp(imageS3.Body, { failOn: 'none' })
-        .resize({ width: resolution, height: resolution, fit: 'inside' })
-        .withMetadata()
-        .toBuffer();
+    const imageS3 = await s3.getObject({ Bucket: bucket, Key: key }).promise();
+    const { taskid } = imageS3.Metadata;
+    const resolutions = [800, 1024];
 
-      const id = await md5(v4());
-      const filename = key.split('/').pop();
-      const filenameSplited = filename.split('.');
-      const ext = filenameSplited.pop();
-      const outputKey = `output/${filenameSplited[0]}/${resolution}/${id}.${ext}`;
+    for (const resolution of resolutions) {
+      try {
+        console.log('Resizing to ', resolution);
+        const resizedImage = await sharp(imageS3.Body, { failOn: 'none' })
+          .resize({ width: resolution, height: resolution, fit: 'inside' })
+          .withMetadata()
+          .toBuffer();
 
-      console.log('Saving to ', outputKey);
-      await s3
-        .putObject({
-          Bucket: bucket,
-          Key: outputKey,
-          Body: resizedImage,
-          ACL: 'public-read',
-        })
-        .promise();
-      await create(IMAGES_TABLE, {
-        id,
-        original: false,
-        path: outputKey,
-        resolution,
-        created: moment().format(),
-      });
-      console.log('Saved!');
-    } catch (err) {
-      console.error(err);
+        const id = await md5(v4());
+        const filename = key.split('/').pop();
+        const filenameSplited = filename.split('.');
+        const ext = filenameSplited.pop();
+        const outputKey = `output/${filenameSplited[0]}/${resolution}/${id}.${ext}`;
+
+        console.log('Saving to ', outputKey);
+        await s3
+          .putObject({
+            Bucket: bucket,
+            Key: outputKey,
+            Body: resizedImage,
+            ACL: 'public-read',
+          })
+          .promise();
+        await create(IMAGES_TABLE, {
+          id,
+          original: false,
+          path: outputKey,
+          resolution,
+          created: moment().format(),
+        });
+        console.log('Saved!');
+      } catch (err) {
+        reject(Error(errorMonitor));
+      }
     }
-  }
 
-  await updateById(
-    TASKS_TABLE,
-    taskid,
-    'SET #state = :state, updated = :updated',
-    { ':state': 'resized', ':updated': moment().format() },
-    { '#state': 'state' },
-  );
+    await updateById(
+      TASKS_TABLE,
+      taskid,
+      'SET #state = :state, updated = :updated',
+      { ':state': 'resized', ':updated': moment().format() },
+      { '#state': 'state' },
+    );
+    resolve(statusCode);
+  });
 
-  return context.logStreamName;
+  return statusCode;
 };
