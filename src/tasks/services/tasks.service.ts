@@ -43,9 +43,7 @@ export class TasksService {
 
   async updateById(taskId: string, state: TaskState): Promise<TaskSchema> {
     try {
-      const {
-        Items: [task],
-      } = await this.dynamoDBProvider.updateById(
+      const task = await this.dynamoDBProvider.updateById(
         this.tableName,
         taskId,
         'set #state = :state, updated = :updated',
@@ -54,7 +52,7 @@ export class TasksService {
       );
       return task;
     } catch (e) {
-      throw new InternalServerErrorException(e);
+      throw new InternalServerErrorException('The task cannot be updated');
     }
   }
 }

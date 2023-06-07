@@ -1,15 +1,17 @@
-import { Controller, Get } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { titleApi } from './common/constants/common-api.constants';
+import { Controller, Get, Render } from '@nestjs/common';
+import { ImagesService } from './tasks/services/image.service';
 
-@ApiTags('API Root')
 @Controller()
 export class AppController {
+
+  constructor(
+    private readonly imagesService: ImagesService
+  ) {}
   @Get()
-  @ApiOperation({
-    description: 'Some ELB use this endpoint for enable the instance',
-  })
-  getRoot(): string {
-    return titleApi;
+  @Render('index')
+  async getRoot(){
+    const uploaded = await this.imagesService.listUploads();
+    const resized = await this.imagesService.listResized();
+    return { uploaded, resized };
   }
 }
