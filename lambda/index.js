@@ -34,7 +34,7 @@ exports.handler = async function (event, context) {
           .withMetadata()
           .toBuffer();
 
-        const id = await md5(v4());
+        const id = md5(v4().toString());
         const filename = key.split('/').pop();
         const filenameSplited = filename.split('.');
         const ext = filenameSplited.pop();
@@ -67,7 +67,7 @@ exports.handler = async function (event, context) {
       taskid,
       'SET #state = :state, updated = :updated',
       { ':state': 'resized', ':updated': moment().format() },
-      { '#state': 'state' },
+      { '#state': 'state' }
     );
     resolve(statusCode);
   });
